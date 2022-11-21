@@ -1,0 +1,25 @@
+<!-- chat/templates/chat/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Rooms</title>
+</head>
+<body>
+    <script>
+        const notificationSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/notification/'
+        );
+
+        document.querySelector('button').onclick = function (e) {
+            const username = document.querySelector('#username');
+            const message = username.value;
+            notificationSocket.send(JSON.stringify({
+                'message': message
+            }));
+        };
+    </script>
+</body>
+</html>
