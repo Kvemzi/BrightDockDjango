@@ -1,11 +1,6 @@
 from rest_framework import serializers
-from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet, Twitter
+from snippets.models import Twitter
 
-
-class SnippetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Snippet
-        fields = ['id', 'title', 'code', 'linenos', 'language', 'style']
 class TwitterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Twitter
