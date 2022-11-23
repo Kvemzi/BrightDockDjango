@@ -92,18 +92,18 @@ def create_duplicates():
 def delete_tweets():
     list_of_keys=[]
     url = 'http://127.0.0.0:8000/twitter/'
-    for i in solution:
-        list_of_keys.append(i['tweet_id'])
-    for i in duplicates:
-        if str(i) not in list_of_keys:
+    for tweet_info in solution:
+        list_of_keys.append(tweet_info['tweet_id'])
+    for tweet_id in duplicates:
+        if str(tweet_id ) not in list_of_keys:
             requests.delete(url + str(i))
 
 #Removing unneceseary duplicates
 def remove_duplicates():
-    for i in duplicates:
+    for tweet_id in duplicates:
         for j in range(0,len(solution)):
             try:
-                if str(solution[j]['tweet_id']) == str(i):
+                if str(solution[j]['tweet_id']) == str(tweet_id):
                     solution.pop(j)
                     break
             except ValueError:
@@ -118,11 +118,11 @@ def give_the_data():
             raise Exception(x.status_code, x.text)
 
 #Sending tweets to WebSocket
-def send_to_ws(i):
-    text_data=json.dumps({"message": i})
+def send_to_ws(tweet_information):
+    text_data=json.dumps({"message": tweet_information})
     ws.send(text_data)
 
-
+#MAIN
 file = open("BearerToken.txt",'r')
 os.environ['TOKEN'] =  file.read()
 bearer_token = auth()
