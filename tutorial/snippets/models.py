@@ -11,4 +11,4 @@ class Twitter(models.Model):
     url_to_tweet = models.TextField(max_length=500)
     
     class Meta:
-        ordering = ['tweet_id']
+        ordering = ['created_at']

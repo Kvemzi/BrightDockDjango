@@ -1,6 +1,5 @@
 
 from snippets.models import Twitter
-
 from snippets.serializers import TwitterSerializer
 from django.shortcuts import render
 

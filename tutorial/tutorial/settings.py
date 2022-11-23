@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-3o2$qa9=hr+bizer1)wet4__c#j1p9q5ugww)@$fyvq62=4x@8
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0']
+ALLOWED_HOSTS = ['0.0.0.0','127.0.0.0']
 
 INSTALLED_APPS = [
     'channels',
