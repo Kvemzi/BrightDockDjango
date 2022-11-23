@@ -2,27 +2,18 @@
 import json
 import os
 import requests
-import websockets
 from websocket import create_connection
 import json
 import time
 
-#Authentication for twitter dev accout through Bearer token:
-file = open("BearerToken.txt",'r')
-os.environ['TOKEN'] =  file.read()
-
 #Function for returning auth token
 def auth():
     return os.getenv('TOKEN')
-bearer_token = auth()
-
 
 #Creating headers for twitter so I can eneter with authorization
 def create_headers(bearer_token):
     headers = {"Authorization": "Bearer {}".format(bearer_token)}
     return headers
-headers = create_headers(bearer_token)
-
 
 #Creating twitter url for reqeuest method
 def create_url(keyword, max_results = 10):
@@ -35,37 +26,23 @@ def create_url(keyword, max_results = 10):
         'tweet.fields':'id,text,author_id,created_at',
     }
     return(search_url,query_params)
-keyword = "#Competition"
-max_results = 10
-url_tweet = create_url (keyword,max_results)
-
 
 #Gathering data from twitter for multiple tweets throufgh url,headers, and params
 def connect_to_endpoint(url, headers, params, next_token = None):
     params['next_token'] = next_token
     response = requests.request("GET", url, headers = headers, params = params)
-    print("Endpoint Response Code: " + str(response.status_code))
     if response.status_code != 200:
         raise Exception(response.status_code, response.text)
     return response.json()
-json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])
-test = json.dumps(json_response, indent = 4, sort_keys = True)
-solution =  []
-print("Solutions for: " + keyword)
-
 
 #Gathering tweet field if tweet filed from searching multiple tweets hase over 230 characters
 def connect_to_endpoint2(url, headers):
     params = {}
     params['tweet.fields'] ='text' 
     response = requests.request("GET", url, headers = headers, params = params)
-    print("Endpoint Response Code: " + str(response.status_code))
     if response.status_code != 200:
         raise Exception(response.status_code, response.text)
     return response.json()
-
-
-
 
 #Reading the collected data and writing is to a list
 #solutions with dict atribute
@@ -87,7 +64,6 @@ def create_solution():
                 author_username = j['username']
                 tweet_url = 'https://twitter.com/' + str(author_username) + '/status/' + str(tweet_id)
                 break
-            
         solution.append({
             'author_id':author_id,
             'tweet_id':tweet_id,
@@ -102,19 +78,15 @@ def create_solution():
 def connect_to_endpoint3 ():
     url = 'http://127.0.0.0:8000/twitter/'
     response = requests.request("GET", url)
-    print("Endpoint Response Code: " + str(response.status_code))
     if response.status_code != 200:
         raise Exception(response.status_code, response.text)
     return response.json()
-duplicates = []
+
 def create_duplicates():
     json_response3 = connect_to_endpoint3() 
     
     for a in json_response3:
         duplicates.append(a['tweet_id'])
-create_duplicates()
-
-
 
 #Deleting tweets which are older than collectd tweets
 def delete_tweets():
@@ -122,12 +94,9 @@ def delete_tweets():
     url = 'http://127.0.0.0:8000/twitter/'
     for i in solution:
         list_of_keys.append(i['tweet_id'])
-        
     for i in duplicates:
         if str(i) not in list_of_keys:
             requests.delete(url + str(i))
-            print('brisem ' + str(i))
-delete_tweets()
 
 #Removing unneceseary duplicates
 def remove_duplicates():
@@ -140,10 +109,6 @@ def remove_duplicates():
             except ValueError:
                 pass
 
-remove_duplicates()
-
-
-
 #Uploading data on server via POST request
 def give_the_data():
     url = 'http://127.0.0.0:8000/twitter/'
@@ -151,20 +116,20 @@ def give_the_data():
         x = requests.post(url, json=obj)
         if x.status_code !=201:
             raise Exception(x.status_code, x.text)
-give_the_data()
 
 #Sending tweets to WebSocket
 def send_to_ws(i):
     text_data=json.dumps({"message": i})
     ws.send(text_data)
-    
-ws = create_connection("ws://127.0.0.0:8000/ws/chat/lobby/")
-for i in solution:
-    send_to_ws(i)
-ws.close()
-print(len(solution))
-#mmain
 
+
+file = open("BearerToken.txt",'r')
+os.environ['TOKEN'] =  file.read()
+bearer_token = auth()
+headers = create_headers(bearer_token)
+keyword = "#WorldCup"
+max_results = 10
+url_tweet = create_url (keyword,max_results)
 while True:
     json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])
     test = json.dumps(json_response, indent = 4, sort_keys = True)
@@ -172,7 +137,7 @@ while True:
     create_solution()
     duplicates=[]
     create_duplicates()
-    print(duplicates)
+    
     delete_tweets()
     remove_duplicates()
     give_the_data()
@@ -180,4 +145,6 @@ while True:
     for i in solution:
         send_to_ws(i)
     ws.close()
+    print ('Predano: ' + str(len(solution)) + ' zahtjeva.')
     time.sleep(5)
+    
