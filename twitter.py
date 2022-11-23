@@ -6,16 +6,7 @@ from websocket import create_connection
 import json
 import time
 
-#Function for returning auth token
-def auth():
-    return os.getenv('TOKEN')
-
-#Creating headers for twitter so I can eneter with authorization
-def create_headers(bearer_token):
-    headers = {"Authorization": "Bearer {}".format(bearer_token)}
-    return headers
-
-#Creating twitter url for reqeuest method
+#Creating twitter url for GET reqeuest method
 def create_url(keyword, max_results = 10):
     search_url = "https://api.twitter.com/2/tweets/search/recent"
     query_params ={
@@ -36,9 +27,9 @@ def connect_to_endpoint(url, headers, params, next_token = None):
     return response.json()
 
 #Gathering tweet field if tweet filed from searching multiple tweets hase over 230 characters
-def connect_to_endpoint2(url, headers):
-    params = {}
-    params['tweet.fields'] ='text' 
+def connect_to_endpoint2(id_of_tweet, headers):
+    url = 'https://api.twitter.com/2/tweets/' + id_of_tweet
+    params = {'tweet.fields':'text'}
     response = requests.request("GET", url, headers = headers, params = params)
     if response.status_code != 200:
         raise Exception(response.status_code, response.text)
@@ -49,19 +40,20 @@ def connect_to_endpoint2(url, headers):
 #soluition = [{mmessage, author_id, tweet_id, created_at, author_name, author_username, tweet_url}]
 def create_solution():
     for i in range(0,len(json_response['data'])):
+
         if len(json_response['data'][i]['text']) > 230:
-            url = 'https://api.twitter.com/2/tweets/' + str(json_response['data'][i]['id'])
-            json_response2 =connect_to_endpoint2(url,headers)
+            json_response2 =connect_to_endpoint2(str(json_response['data'][i]['id']),headers)
             message = json_response2['data']['text']
         else:
             message = json_response['data'][i]['text']
+            
         author_id = json_response['data'][i]['author_id']
         tweet_id = json_response['data'][i]['id']
         created_at = json_response['data'][i]['created_at']
-        for j in json_response['includes']['users']:
-            if(author_id == j['id']):
-                author_name = j['name']
-                author_username = j['username']
+        for user in json_response['includes']['users']:
+            if(author_id == user['id']):
+                author_name = user['name']
+                author_username = user['username']
                 tweet_url = 'https://twitter.com/' + str(author_username) + '/status/' + str(tweet_id)
                 break
         solution.append({
@@ -74,9 +66,8 @@ def create_solution():
             'url_to_tweet':tweet_url
         })
 
-#Getting data from server which I have uploaded earlier
+#Getting data from server 
 def connect_to_endpoint3 ():
-    url = 'http://127.0.0.0:8000/twitter/'
     response = requests.request("GET", url)
     if response.status_code != 200:
         raise Exception(response.status_code, response.text)
@@ -84,19 +75,17 @@ def connect_to_endpoint3 ():
 
 def create_duplicates():
     json_response3 = connect_to_endpoint3() 
-    
-    for a in json_response3:
-        duplicates.append(a['tweet_id'])
+    for tweet in json_response3:
+        duplicates.append(tweet['tweet_id'])
 
-#Deleting tweets which are older than collectd tweets
+#Deleting tweets which are older than collected tweets
 def delete_tweets():
     list_of_keys=[]
-    url = 'http://127.0.0.0:8000/twitter/'
     for tweet_info in solution:
         list_of_keys.append(tweet_info['tweet_id'])
     for tweet_id in duplicates:
         if str(tweet_id ) not in list_of_keys:
-            requests.delete(url + str(i))
+            requests.delete(url + str(tweet_id))
 
 #Removing unneceseary duplicates
 def remove_duplicates():
@@ -111,7 +100,6 @@ def remove_duplicates():
 
 #Uploading data on server via POST request
 def give_the_data():
-    url = 'http://127.0.0.0:8000/twitter/'
     for obj in solution:
         x = requests.post(url, json=obj)
         if x.status_code !=201:
@@ -121,30 +109,36 @@ def give_the_data():
 def send_to_ws(tweet_information):
     text_data=json.dumps({"message": tweet_information})
     ws.send(text_data)
+def authorization():
+    file = open("BearerToken.txt",'r')
+    os.environ['TOKEN'] =  file.read()
+    bearer_token = os.getenv('TOKEN')
+    return {"Authorization": "Bearer {}".format(bearer_token)}
 
 #MAIN
-file = open("BearerToken.txt",'r')
-os.environ['TOKEN'] =  file.read()
-bearer_token = auth()
-headers = create_headers(bearer_token)
-keyword = "#WorldCup"
-max_results = 10
-url_tweet = create_url (keyword,max_results)
-while True:
-    json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])
-    test = json.dumps(json_response, indent = 4, sort_keys = True)
-    solution=[]
-    create_solution()
-    duplicates=[]
-    create_duplicates()
-    
-    delete_tweets()
-    remove_duplicates()
-    give_the_data()
+if __name__ == "__main__":
+    headers = authorization()
+    keyword = "#Croatia"
+    max_results = 10
+    url_tweet = create_url (keyword,max_results)
     ws = create_connection("ws://127.0.0.0:8000/ws/chat/lobby/")
-    for i in solution:
-        send_to_ws(i)
+    url = 'http://127.0.0.0:8000/twitter/'
+    while True:
+        try:
+            json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])
+            test = json.dumps(json_response, indent = 4, sort_keys = True)
+            solution=[]
+            create_solution()
+            duplicates=[]
+            create_duplicates()
+            delete_tweets()
+            remove_duplicates()
+            give_the_data()
+            for i in solution:
+                send_to_ws(i)
+            print ('Predano: ' + str(len(solution)) + ' zahtjeva.')
+            time.sleep(5)
+        except KeyboardInterrupt:
+            break
+
     ws.close()
-    print ('Predano: ' + str(len(solution)) + ' zahtjeva.')
-    time.sleep(5)
-    
