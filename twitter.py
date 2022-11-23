@@ -5,6 +5,7 @@ import requests
 from websocket import create_connection
 import json
 import time
+import sys
 
 #Creating twitter url for GET reqeuest method
 def create_url(keyword, max_results = 10):
@@ -39,32 +40,35 @@ def connect_to_endpoint2(id_of_tweet, headers):
 #solutions with dict atribute
 #soluition = [{mmessage, author_id, tweet_id, created_at, author_name, author_username, tweet_url}]
 def create_solution():
-    for i in range(0,len(json_response['data'])):
+    try:
+        for i in range(0,len(json_response['data'])):
 
-        if len(json_response['data'][i]['text']) > 230:
-            json_response2 =connect_to_endpoint2(str(json_response['data'][i]['id']),headers)
-            message = json_response2['data']['text']
-        else:
-            message = json_response['data'][i]['text']
-            
-        author_id = json_response['data'][i]['author_id']
-        tweet_id = json_response['data'][i]['id']
-        created_at = json_response['data'][i]['created_at']
-        for user in json_response['includes']['users']:
-            if(author_id == user['id']):
-                author_name = user['name']
-                author_username = user['username']
-                tweet_url = 'https://twitter.com/' + str(author_username) + '/status/' + str(tweet_id)
-                break
-        solution.append({
-            'author_id':author_id,
-            'tweet_id':tweet_id,
-            'tweet':message,
-            'created_at':created_at,
-            'author_name':author_name,
-            'author_username':author_username,
-            'url_to_tweet':tweet_url
-        })
+            if len(json_response['data'][i]['text']) > 230:
+                json_response2 =connect_to_endpoint2(str(json_response['data'][i]['id']),headers)
+                message = json_response2['data']['text']
+            else:
+                message = json_response['data'][i]['text']
+                
+            author_id = json_response['data'][i]['author_id']
+            tweet_id = json_response['data'][i]['id']
+            created_at = json_response['data'][i]['created_at']
+            for user in json_response['includes']['users']:
+                if(author_id == user['id']):
+                    author_name = user['name']
+                    author_username = user['username']
+                    tweet_url = 'https://twitter.com/' + str(author_username) + '/status/' + str(tweet_id)
+                    break
+            solution.append({
+                'author_id':author_id,
+                'tweet_id':tweet_id,
+                'tweet':message,
+                'created_at':created_at,
+                'author_name':author_name,
+                'author_username':author_username,
+                'url_to_tweet':tweet_url
+            })
+    except KeyError:
+        print('There is not any new data given at the moment')    
 
 #Getting data from server 
 def connect_to_endpoint3 ():
@@ -117,28 +121,31 @@ def authorization():
 
 #MAIN
 if __name__ == "__main__":
-    headers = authorization()
-    keyword = "#Croatia"
-    max_results = 10
-    url_tweet = create_url (keyword,max_results)
-    ws = create_connection("ws://127.0.0.0:8000/ws/chat/lobby/")
-    url = 'http://127.0.0.0:8000/twitter/'
-    while True:
-        try:
-            json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])
-            test = json.dumps(json_response, indent = 4, sort_keys = True)
-            solution=[]
-            create_solution()
-            duplicates=[]
-            create_duplicates()
-            delete_tweets()
-            remove_duplicates()
-            give_the_data()
-            for i in solution:
-                send_to_ws(i)
-            print ('Predano: ' + str(len(solution)) + ' zahtjeva.')
-            time.sleep(5)
-        except KeyboardInterrupt:
-            break
+    if len(sys.argv)==1:
+        print("Tell me why, ain't nothing but a empty string. O TELL ME WHY")
+    else:
+        headers = authorization()
+        keyword = '#' + sys.argv[1]
+        max_results = 10
+        url_tweet = create_url (keyword,max_results)
+        ws = create_connection("ws://127.0.0.0:8000/ws/chat/lobby/")
+        url = 'http://127.0.0.0:8000/twitter/'
+        while True:
+            try:
+                json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])
+                test = json.dumps(json_response, indent = 4, sort_keys = True)
+                solution=[]
+                create_solution()
+                duplicates=[]
+                create_duplicates()
+                delete_tweets()
+                remove_duplicates()
+                give_the_data()
+                for i in solution:
+                    send_to_ws(i)
+                print ('Predano: ' + str(len(solution)) + ' zahtjeva.')
+                time.sleep(5)
+            except KeyboardInterrupt:
+                break
 
-    ws.close()
+        ws.close()
