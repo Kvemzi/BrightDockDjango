@@ -1,0 +1,75 @@
+usao
+ws://127.0.0.0:8000/ws/chat/competition/
+Nakon soluztiona:
+usao
+koenkcije ide http://127.0.0.0:8000/twitter/
+prosao
+<Response [200]>
+konektovao sam se
+[]
+usao u delte tweet
+saljem request
+saljem request
+saljem request
+saljem request
+saljem request
+saljem request
+saljem request
+saljem request
+saljem request
+saljem request
+Nakon soluztiona:
+usao
+koenkcije ide http://127.0.0.0:8000/twitter/
+prosao
+<Response [200]>
+konektovao sam se
+[]
+usao u delte tweet
+saljem request
+saljem request
+Nakon soluztiona:
+usao
+koenkcije ide http://127.0.0.0:8000/twitter/
+prosao
+<Response [200]>
+konektovao sam se
+[]
+usao u delte tweet
+saljem request
+saljem request
+Nakon soluztiona:
+usao
+koenkcije ide http://127.0.0.0:8000/twitter/
+prosao
+<Response [200]>
+konektovao sam se
+[]
+usao u delte tweet
+saljem request
+Nakon soluztiona:
+usao
+koenkcije ide http://127.0.0.0:8000/twitter/
+prosao
+<Response [200]>
+konektovao sam se
+[]
+usao u delte tweet
+Nakon soluztiona:
+usao
+koenkcije ide http://127.0.0.0:8000/twitter/
+prosao
+<Response [200]>
+konektovao sam se
+[]
+usao u delte tweet
+Nakon soluztiona:
+usao
+koenkcije ide http://127.0.0.0:8000/twitter/
+prosao
+<Response [200]>
+konektovao sam se
+[]
+usao u delte tweet
+saljem request
+saljem request

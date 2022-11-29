@@ -3,9 +3,9 @@ import json
 import os
 import requests
 from websocket import create_connection
-import json
 import time
 import sys
+
 
 #Creating twitter url for GET reqeuest method
 def create_url(keyword, max_results = 10):
@@ -70,28 +70,41 @@ def create_solution(json_response, headers):
             })
     except KeyError:
         print('There is not any new data given at the moment')    
+    return solution
 
 #Getting data from server 
 def connect_to_endpoint3 (url):
-    response = requests.request("GET", url)
+    print('koenkcije ide ' + url)
+    response = requests.get(url)
+    print('prosao')
+    print(response)
     if response.status_code != 200:
         raise Exception(response.status_code, response.text)
     return response.json()
 
 def create_duplicates(url):
+    print('usao')
     json_response3 = connect_to_endpoint3(url) 
+    print('konektovao sam se')
     duplicates = []
+    print(duplicates)
     for tweet in json_response3:
         duplicates.append(tweet['tweet_id'])
     return duplicates
 
 #Deleting tweets which are older than collected tweets
 def delete_tweets(solution, duplicates, url):
+    print('usao u delte tweet')
     list_of_keys=[]
+   
     for tweet_info in solution:
+        
         list_of_keys.append(tweet_info['tweet_id'])
+   
     for tweet_id in duplicates:
+
         if str(tweet_id ) not in list_of_keys:
+            print('saljem request')
             requests.delete(url + str(tweet_id))
 
 #Removing unneceseary duplicates
@@ -126,32 +139,30 @@ def authorization():
     return {"Authorization": "Bearer {}".format(bearer_token)}
 
 #MAIN
-def run(hashtag):
+if __name__ == '__main__':
     print('usao')
+
     time.sleep(2)
     headers = authorization()
-    keyword = '#' + str(hashtag)
+    keyword = '#' + str(sys.argv[1])
     max_results = 10
     url_tweet = create_url (keyword,max_results)
-    print('pripremna za konekciju')
-    ws =create_connection("ws://127.0.0.0:8000/ws/chat/lobby/")
+    url_for_ws ="ws://127.0.0.0:8000/ws/chat/" + str(sys.argv[1]) + "/"
     url = 'http://127.0.0.0:8000/twitter/'
-    print('usao3')
+    print(url_for_ws)
+    ws =create_connection(url_for_ws)
     while True:
         try:
-            print('pocetak')
-            json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])
-            test = json.dumps(json_response, indent = 4, sort_keys = True)
+            json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])    
             solution=create_solution(json_response, headers)
+            print('Nakon soluztiona:')
             duplicates=create_duplicates(url)
             delete_tweets(solution,duplicates,url)
-            solution = remove_duplicates()
+            solution = remove_duplicates(duplicates,solution)
             give_the_data(solution, url)
             for i in solution:
                 send_to_ws(i, ws)
-            print ('Predano: ' + str(len(solution)) + ' zahtjeva.')
-            time.sleep(5)
-            break
+            time.sleep(10)
         except KeyboardInterrupt:
             break
     ws.close()
