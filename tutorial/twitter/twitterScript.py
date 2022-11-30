@@ -82,18 +82,19 @@ def connect_to_endpoint3 (url):
         raise Exception(response.status_code, response.text)
     return response.json()
 
-def create_duplicates(url):
+def create_latest():
+    url = 'http://127.0.0.0:8000/twitter/'
     print('usao')
     json_response3 = connect_to_endpoint3(url) 
     print('konektovao sam se')
-    duplicates = []
-    print(duplicates)
+    latest = []
+    print(latest)
     for tweet in json_response3:
-        duplicates.append(tweet['tweet_id'])
-    return duplicates
+        latest.append(tweet['tweet_id'])
+    return latest
 
 #Deleting tweets which are older than collected tweets
-def delete_tweets(solution, duplicates, url):
+def delete_tweets(solution, latest, url):
     print('usao u delte tweet')
     list_of_keys=[]
    
@@ -101,15 +102,15 @@ def delete_tweets(solution, duplicates, url):
         
         list_of_keys.append(tweet_info['tweet_id'])
    
-    for tweet_id in duplicates:
+    for tweet_id in latest:
 
         if str(tweet_id ) not in list_of_keys:
             print('saljem request')
             requests.delete(url + str(tweet_id))
 
-#Removing unneceseary duplicates
-def remove_duplicates(duplicates,solution):
-    for tweet_id in duplicates:
+#Removing unneceseary latest
+def remove_latest(latest,solution):
+    for tweet_id in latest:
         for j in range(0,len(solution)):
             try:
                 if str(solution[j]['tweet_id']) == str(tweet_id):
@@ -137,6 +138,9 @@ def authorization():
     os.environ['TOKEN'] =  file.read()
     bearer_token = os.getenv('TOKEN')
     return {"Authorization": "Bearer {}".format(bearer_token)}
+def foo():
+    
+    return create_latest()
 
 #MAIN
 if __name__ == '__main__':
@@ -150,19 +154,22 @@ if __name__ == '__main__':
     url_for_ws ="ws://127.0.0.0:8000/ws/chat/" + str(sys.argv[1]) + "/"
     url = 'http://127.0.0.0:8000/twitter/'
     print(url_for_ws)
-    ws =create_connection(url_for_ws)
+    
     while True:
         try:
+            print('idem na twitter')
             json_response = connect_to_endpoint(url_tweet[0], headers, url_tweet[1])    
-            solution=create_solution(json_response, headers)
-            print('Nakon soluztiona:')
-            duplicates=create_duplicates(url)
-            delete_tweets(solution,duplicates,url)
-            solution = remove_duplicates(duplicates,solution)
+            solution=create_solution(json_response, headers)                
+            print('Nakon solutiona:')
+            latest=create_latest()
+            delete_tweets(solution,latest,url)
+            solution = remove_latest(latest,solution)
             give_the_data(solution, url)
+            ws =create_connection(url_for_ws)
             for i in solution:
                 send_to_ws(i, ws)
+            ws.close()
             time.sleep(10)
         except KeyboardInterrupt:
             break
-    ws.close()
+    

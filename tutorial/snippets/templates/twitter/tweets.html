@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <title>LookUps</title>
+    </head>
+<body>
+    	
+{% for tweet in twitter_post.all %}
+    <p>Author ID: {{tweet.author_id}} </p>
+    <br>
+    <p>Tweet created at: {{tweet.created_at}} </p>
+    <br>
+    <p>Author Name: {{tweet.author_name}} </p>
+    <br>
+    <p>Author Username: {{tweet.author_username}} </p>
+    <br>
+    <p>URL to Tweet: {{tweet.url_to_tweet}} </p>
+    <br>
+    <p>Tweet: {{tweet.tweet}} </p>
+    <br>
+    <hr>
+{% endfor %}
+<script>
+    const hashtagName = JSON.parse(document.getElementById('hashtag-name').textContent);
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/lookup/'
+        + hashtagName + '/'
+    );
+    console.log(hashtagName);
+
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        document.querySelector('#chat-log').value += (
+            data.message.author_name + "\n" +
+            data.message.author_username + "\n" +
+            data.message.tweet + "\n" + 
+            data.message.created_at +"\n"+
+            "--------------------------------------------\n"
+            );
+    };
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+
+    
+</script>
+</body>
+</html>
+

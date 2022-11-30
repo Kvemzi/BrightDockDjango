@@ -5,10 +5,12 @@ from snippets import views
 
 
 urlpatterns = [
-    path('',views.index, name='index'),
+    path('',views.TwitterList.as_view()),
     path("chat/<str:room_name>/", views.room, name="room"),
     path('twitter/', views.TwitterList.as_view()),
     path('twitter/<int:pk>/',views.TwitterDetail.as_view()),
+    path('lookup/', views.index_tweet),
+    path('lookup/<str:hashtag>/',views.tweets, name="tweets"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
