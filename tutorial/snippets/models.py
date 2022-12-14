@@ -12,6 +12,8 @@ class Twitter(models.Model):
     
     class Meta:
         ordering = ['created_at']
+
+
 class Room(models.Model):
     number = {}
     checkin = {}

@@ -9,6 +9,8 @@
     {% for tweet in twitter_post.all %}
     <p>Author ID: {{tweet.author_id}} </p>
 
+    <p>Tweet ID: {{tweet.tweet_id}}</p>
+
     <p>Tweet created at: {{tweet.created_at}} </p>
 
     <p>Author Name: {{tweet.author_name}} </p>
@@ -36,7 +38,6 @@
             + roomName
             + '/'
         );
-        
         console.log('test1')
         //chatSocket.onmessage = function(e) {
         //    const data = JSON.parse(e.data);
@@ -46,11 +47,14 @@
             console.log('test2')
             const data = JSON.parse(e.data);
             document.querySelector('#chat-log').value += (
+                data.message.author_id + '\n' +
+                data.message.tweet_id + '\n'+
+                data.message.created_at +"\n"+
                 data.message.author_name + "\n" +
                 data.message.author_username + "\n" +
+                data.message.url + "\n" +
                 data.message.tweet + "\n" + 
-                data.message.created_at +"\n"+
-                "--------------------------------------------\n"
+                "________________________________________________________\n"
                 );
             
         };

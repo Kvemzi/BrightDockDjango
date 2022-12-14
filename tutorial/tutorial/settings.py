@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -10,8 +11,11 @@ DEBUG = True
 ALLOWED_HOSTS = ['0.0.0.0','127.0.0.0']
 
 INSTALLED_APPS = [
+    'django_extensions',
+    'snippets',
     'channels',
     'daphne',
+    'django.contrib.admindocs',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -19,7 +23,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'snippets',
+
+    
 ]
 
 MIDDLEWARE = [

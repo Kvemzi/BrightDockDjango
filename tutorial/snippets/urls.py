@@ -5,7 +5,7 @@ from snippets import views
 
 
 urlpatterns = [
-    path('',views.TwitterList.as_view()),
+    path('',views.index),
     path("chat/<str:room_name>/", views.room, name="room"),
     path('twitter/', views.TwitterList.as_view()),
     path('twitter/<int:pk>/',views.TwitterDetail.as_view()),
