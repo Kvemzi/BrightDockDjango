@@ -1,4 +1,3 @@
-import time
 from django.db import models
 
 class Twitter(models.Model):
@@ -12,4 +11,3 @@ class Twitter(models.Model):
     
     class Meta:
         ordering = ['created_at']
-
