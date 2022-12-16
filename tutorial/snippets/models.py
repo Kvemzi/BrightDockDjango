@@ -1,5 +1,5 @@
+import time
 from django.db import models
-
 
 class Twitter(models.Model):
     author_id = models.BigIntegerField()
@@ -13,8 +13,3 @@ class Twitter(models.Model):
     class Meta:
         ordering = ['created_at']
 
-
-class Room(models.Model):
-    number = {}
-    checkin = {}
-    

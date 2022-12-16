@@ -1,15 +1,14 @@
 from snippets.models import Twitter
 from snippets.serializers import TwitterSerializer
 from django.shortcuts import render
-from twitter import twitterScript
+
 
 from rest_framework import generics
 def index(request):
     return render(request, "chat/index.html")
 def room(request, room_name):
-    script = twitterScript
     twitter_post=Twitter.objects
-    return render(request, "chat/room.html", {"room_name": room_name,'twitter_post':twitter_post,'scriptTweet':script})
+    return render(request, "chat/room.html", {"room_name": room_name,'twitter_post':twitter_post})
 
 
 def index_tweet(request):

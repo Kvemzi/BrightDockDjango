@@ -23,7 +23,7 @@
 
     <hr>
 {% endfor %}
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    <textarea id="chat-log" cols="200" rows="20"></textarea><br>
 
     {{ room_name|json_script:"room-name" }}
     
@@ -38,11 +38,6 @@
             + roomName
             + '/'
         );
-        console.log('test1')
-        //chatSocket.onmessage = function(e) {
-        //    const data = JSON.parse(e.data);
-        //    document.querySelector('#chat-log').value += (data.message + '\n');
-        //}
         chatSocket.onmessage = function(e) {
             console.log('test2')
             const data = JSON.parse(e.data);
