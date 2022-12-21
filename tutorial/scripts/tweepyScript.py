@@ -80,7 +80,7 @@ def writeInDB(solution):
         t = Twitter.objects.create(author_id=data['author_id'], tweet_id=data['tweet_id'], tweet=data['tweet'], created_at=data['created_at'],
                                    author_name=data['author_name'], author_username=data['author_username'], url_to_tweet=data['url']),
 
-# Send only new data to wehbsocket
+# Send only new data to websocket
 
 
 def send_to_ws(tweet_information, ws):
@@ -88,7 +88,7 @@ def send_to_ws(tweet_information, ws):
     ws.send(text_data)
 
 
-def run(hashtag='Fifa'):
+def run(hashtag='croatia'):
     hashtag2 = '#' + hashtag
     response = getTweets(hashtag2)
     solutions = formatTweets(response)
@@ -107,4 +107,4 @@ def run(hashtag='Fifa'):
 
 
 if __name__ == '__main__':
-    run('#fifa')
+    run('#Fifa')
