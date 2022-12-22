@@ -2,6 +2,8 @@
 
 Webscraping tweet files from users input
 
+Using DBSQL :)
+
 if input is croatia it will give you latest 10 twwets in 7 days which holds #croatia in tweet
 
 Download all files
