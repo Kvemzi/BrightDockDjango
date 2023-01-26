@@ -7,9 +7,8 @@ from snippets import views
 urlpatterns = [
     path('', views.index),
     path("chat/<str:room_name>/", views.room, name="room"),
-    path('twitter/', views.TwitterList.as_view()),
-    path('twitter/<int:pk>/', views.TwitterDetail.as_view()),
-    path('simple_function', views.simple_function)
+    path('twitter/', views.TwitterList.as_view(), name='TwitterList'),
+    path('twitter/<int:pk>/', views.TwitterDetail.as_view()), 
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

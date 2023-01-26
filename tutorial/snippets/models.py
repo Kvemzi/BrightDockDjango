@@ -1,6 +1,10 @@
 from django.db import models
 
 class Twitter(models.Model):
+    '''
+        Twitter model for Twitter snippets created by webscraping tweets from twitter.
+        Sorted by created by atribute for timeline of tweets.
+    '''
     author_id = models.BigIntegerField()
     tweet_id = models.BigIntegerField(primary_key=True)
     tweet = models.TextField()

@@ -6,6 +6,7 @@
     <title>Chat Room</title>
 </head>
 <body>
+
     {% for tweet in twitter_post.all %}
     <p>Author ID: {{tweet.author_id}} </p>
 
@@ -23,6 +24,7 @@
 
     <hr>
 {% endfor %}
+    <button onclick="location.href='{% url 'room' room_name %}'">klikni me</button>
     <textarea id="chat-log" cols="200" rows="20"></textarea><br>
 
     {{ room_name|json_script:"room-name" }}
